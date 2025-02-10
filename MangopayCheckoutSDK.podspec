@@ -20,7 +20,7 @@ Pod::Spec.new do |spec|
   spec.swift_version = '5.0'
 
 
-  spec.source       = { :git => "https://gitlab.com/mangopay/dev/checkout-ios-sdk.git", :tag => "#{spec.version}", :branch => "main" }
+  spec.source       = { :git => "https://github.com/Mangopay/mangopay-checkout-ios.git", :tag => "#{spec.version}", :branch => "main" }
 
   spec.source_files  = "MangopayCheckoutSDK/**/*.swift"
   spec.dependency     'PayPal/PaymentButtons'
@@ -33,7 +33,7 @@ Pod::Spec.new do |spec|
   ]
   
   spec.resource_bundles = {
-    'MangopayiOSSDK_MangopayCheckoutSDK' => ['MangopayCheckoutSDK/Resources/**/*.swift', 'MangopayCheckoutSDK/**/*.{png,jpeg,jpg,storyboard,xib,xcassets']
+    'MangopayiOSSDK_MangopayCheckoutSDK' => ['MangopayCheckoutSDK/**/*.{lproj,png,jpeg,jpg,storyboard,xib,xcassets,json}']
   }
 
 
