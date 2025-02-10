@@ -11,10 +11,10 @@ extension Bundle {
     
     private static let core: Bundle = .init(for: PaymentFormView.self)
     
-    internal static var mgpInternal: Bundle {
-        let url = core.url(forResource: "Resources", withExtension: "bundle")
+    internal static var mgpInternal: Bundle = {
+        let url = core.url(forResource: "MangopayiOSSDK_MangopayCheckoutSDK", withExtension: "bundle")
         let bundle = url.flatMap { Bundle(url: $0) }
         return bundle ?? core
-    }
+    }()
     
 }
