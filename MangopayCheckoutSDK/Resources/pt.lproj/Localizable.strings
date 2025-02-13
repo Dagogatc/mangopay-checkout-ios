@@ -1,0 +1,28 @@
+/* 
+  Localizable.strings
+  
+
+  Created by Elikem Savie on 17/10/2022.
+  
+*/
+
+"CARD_INFO_TITLE" = "Informações do cartão";
+"CARD_NUMBER_PLACEHOLDER" = "Número do cartão";
+"CARD_NAME_PLACEHOLDER" = "Nome no cartão";
+"CARD_EXPIRIY_PLACEHOLDER" = "MM/AA";
+"CARD_CVV" = "CVV";
+"SAVE_PAYMENT_CHECKMARK" = "Guardar cartão";
+"BILLING_ADDRESS_CHECKMARK" = "Billing address is same as shipping";
+"BILLING_INFO_TITLE" = "Billing Information";
+"CARD_COUNTRY_PLACEHOLDER" = "Select Country";
+"CARD_ZIP_PLACEHOLDER" = "ZIP/ Postal Code";
+"ERROR_CARD_NUMBER_INVALID" = "Número de cartão inválido";
+"ERROR_CARD_NUMBER_REQUIRED" = "O número do cartão é obrigatório";
+"ERROR_CARD_MIN_NUMBER" = "O número mínimo de dígitos é 13";
+"ERROR_FULLNAME_REQUIRED" = "Nome completo é obrigatório";
+"ERROR_CARD_EXPIRED" = "Data de validade é necessária";
+"ERROR_CVC_REQUIRED" = "CVC é obrigatório";
+"ERROR_EXPIRED_DATE_REQUIRED" = "Data de validade é necessária";
+"ERROR_TEXT_TOO_SHORT" = "O texto é muito curto";
+"ERROR_EXPIRED_DATE" = "O seu cartão expirou";
+"ERROR_FUTURE_DATE" = "Data muito distante no futuro";

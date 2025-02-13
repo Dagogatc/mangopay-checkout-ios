@@ -16,7 +16,7 @@ public class MGPPaymentForm: UIView, FormValidatable {
     lazy var headerView = HeaderView()
 
     lazy var cardNumberField = MangoPayTextfield(
-        placeholderText: "Card number",
+        placeholderText: LocalizableString.CARD_NUMBER_PLACEHOLDER,
         leftImage: UIImage(systemName: "creditcard"),
         keyboardType: .numberPad,
         returnKeyType: .next,

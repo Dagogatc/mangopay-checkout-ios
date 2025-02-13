@@ -7,6 +7,7 @@
 
 
 "CARD_INFO_TITLE" = "Informations sur la carte";
+"CARD_NUMBER_PLACEHOLDER" = "Numéro de carte";
 "CARD_NAME_PLACEHOLDER" = "Nom sur la carte";
 "CARD_EXPIRIY_PLACEHOLDER" = "MM/AA";
 "CARD_CVV" = "CVV";
@@ -22,6 +23,6 @@
 "ERROR_CARD_EXPIRED" = "La date d'expiration de votre carte n'est pas valide";
 "ERROR_CVC_REQUIRED" = "CVC requis";
 "ERROR_EXPIRED_DATE_REQUIRED" = "Date de réexpiration du CVC requise";
-"ERROR_TEXT_TOO_SHORT" = "Le texte est trop court.";
+"ERROR_TEXT_TOO_SHORT" = "Le texte est trop court";
 "ERROR_EXPIRED_DATE" = "Date d'expiration de la carte";
 "ERROR_FUTURE_DATE" = "Date trop loin dans le futur";

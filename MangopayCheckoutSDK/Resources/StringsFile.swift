@@ -17,6 +17,7 @@ public func localize(_ key: String, comment: String = "") -> String {
 
 enum LocalizableString {
     static let CARD_INFO_TITLE = localize("CARD_INFO_TITLE")
+    static let CARD_NUMBER_PLACEHOLDER = localize("CARD_NUMBER_PLACEHOLDER")
     static let CARD_NAME_PLACEHOLDER = localize("CARD_NAME_PLACEHOLDER")
     static let CARD_EXPIRIY_PLACEHOLDER = localize("CARD_EXPIRIY_PLACEHOLDER")
     static let CARD_CVV = localize("CARD_CVV")
