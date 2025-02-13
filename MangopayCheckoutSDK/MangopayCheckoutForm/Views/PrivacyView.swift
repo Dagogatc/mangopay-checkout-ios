@@ -77,7 +77,7 @@ public class PrivacyView: UIView {
 
     @objc func didTapUpgradeLabel(gesture: UITapGestureRecognizer) {
         guard let upgradeText = titleLabel.text else {return}
-        let updateRange = (upgradeText as NSString).range(of: "Privacy Statement.")
+        let updateRange = (upgradeText as NSString).range(of: "Privacy")
 
         if gesture.didTapAttributedTextInLabel(label: titleLabel, inRange: updateRange) {
             didTapPrivacyAction?()
