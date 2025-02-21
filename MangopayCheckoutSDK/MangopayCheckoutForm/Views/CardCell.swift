@@ -14,7 +14,7 @@ class CardCell: UICollectionViewCell {
 
     lazy var cardImage = IconImage.create(
         iconName: "dropDownIcon",
-        iconHeight: 24,
+        iconHeight: 20,
         iconWidth: 32,
         contentMode: .scaleAspectFit
     )
