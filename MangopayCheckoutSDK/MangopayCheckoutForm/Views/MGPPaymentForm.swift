@@ -31,19 +31,6 @@ public class MGPPaymentForm: UIView, FormValidatable {
         textfield.accessibilityLabel = "cardNumberField"
     }
 
-    lazy var cardNameField = MangoPayTextfield(
-        placeholderText: LocalizableString.CARD_NAME_PLACEHOLDER,
-        returnKeyType: .next,
-        validationRule: [
-            .fullNameRequired,
-            .textTooShort
-        ],
-        style: self.paymentFormStyle,
-        textfieldDelegate: self
-    ) { textfield in
-        textfield.accessibilityLabel = "cardNameField"
-    }
-
     lazy var expiryDateField = MangoPayTextfield(
         placeholderText: LocalizableString.CARD_EXPIRIY_PLACEHOLDER,
         keyboardType: .numberPad,
@@ -91,7 +78,6 @@ public class MGPPaymentForm: UIView, FormValidatable {
         views: [
             headerView,
             cardNumberField,
-            cardNameField,
             hStack,
             privacyView
         ]
@@ -102,7 +88,6 @@ public class MGPPaymentForm: UIView, FormValidatable {
 
     lazy public var forms: [Validatable] = [
         cardNumberField,
-        cardNameField,
         expiryDateField,
         cvvField
     ]
@@ -134,7 +119,7 @@ public class MGPPaymentForm: UIView, FormValidatable {
 
         return MGPCardInfo(
             cardNumber: cardNumberField.text?.trimCard(),
-            cardHolderName: cardNameField.text?.trimCard(),
+            cardHolderName: nil,
             cardExpirationDate: expStr,
             cardCvx: cvvField.text,
             cardType: "CB_VISA_MASTERCARD"
@@ -197,7 +182,7 @@ public class MGPPaymentForm: UIView, FormValidatable {
         vStack.leftAnchor.constraint(equalTo: leftAnchor, constant: 16).isActive = true
         vStack.rightAnchor.constraint(equalTo: rightAnchor, constant: -16).isActive = true
         vStack.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor, constant: -8).isActive = true
-        vStack.heightAnchor.constraint(equalToConstant: 340).isActive = true
+        vStack.heightAnchor.constraint(equalToConstant: 245).isActive = true
 
         self.backgroundColor = .white
         self.translatesAutoresizingMaskIntoConstraints = false
@@ -210,7 +195,6 @@ public class MGPPaymentForm: UIView, FormValidatable {
     func clearForm() {
         [
            cardNumberField,
-           cardNameField,
            expiryDateField,
            cvvField
         ].forEach({$0.textfield.text = ""})
@@ -219,7 +203,6 @@ public class MGPPaymentForm: UIView, FormValidatable {
     func manuallyValidateForms() {
         [
            cardNumberField,
-           cardNameField,
            expiryDateField,
            cvvField
         ].forEach({isFormValid($0)})
@@ -255,12 +238,6 @@ public class MGPPaymentForm: UIView, FormValidatable {
             cardNumberField.textfield,
             mode: .ContentFree,
             name: "cardNumberField"
-        )
-
-        NTHNethone.register(
-            cardNameField.textfield,
-            mode: .ContentFree,
-            name: "cardNameField"
         )
 
         NTHNethone.register(
@@ -352,8 +329,6 @@ extension MGPPaymentForm: UITextFieldDelegate {
     public func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         switch textField {
         case cardNumberField.textfield:
-            cardNameField.setResponsder()
-        case cardNameField.textfield:
             expiryDateField.setResponsder()
         case expiryDateField.textfield:
             cvvField.setResponsder()
@@ -513,11 +488,6 @@ extension MGPPaymentForm: UITextFieldDelegate {
         switch textField {
         case cardNumberField.textfield:
             let isValid = isFormValid(cardNumberField)
-            if !isValid {
-                SentryManager.log(error: MGPError.cardNameInvalid)
-            }
-        case cardNameField.textfield:
-            let isValid = isFormValid(cardNameField)
             if !isValid {
                 SentryManager.log(error: MGPError.cardNameInvalid)
             }
