@@ -28,8 +28,7 @@ final class URLHelper: URLHelping {
             return _3DSResult(
                 type: _type,
                 status: _3DSStatus(rawValue: statusStr) ?? .FAILED,
-                id: id,
-                nethoneAttemptReference: nil
+                id: id
             )
         } else {
             for type in _3DSTransactionType.allCases {
@@ -37,8 +36,7 @@ final class URLHelper: URLHelping {
                 return _3DSResult(
                     type: type,
                     status: _3DSStatus(rawValue: statusStr) ?? .FAILED,
-                    id: id,
-                    nethoneAttemptReference: nil
+                    id: id
                 )
             }
 

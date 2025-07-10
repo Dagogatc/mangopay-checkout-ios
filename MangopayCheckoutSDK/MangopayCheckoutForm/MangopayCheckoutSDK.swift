@@ -1,6 +1,5 @@
 import Foundation
 import UIKit
-import NethoneSDK
 
 public struct MangopayCheckoutSDK {
 
@@ -8,30 +7,11 @@ public struct MangopayCheckoutSDK {
     public static var apiKey: String!
     static var environment: MGPEnvironment!
 
-    public static func initialize(clientId: String, profillingMerchantId: String, checkoutRerefence: String, environment: MGPEnvironment) {
+    public static func initialize(clientId: String, checkoutRerefence: String, environment: MGPEnvironment) {
         self.clientId = clientId
         self.environment = environment
 
-        SentryManager.initialize(
-            environment: environment,
-            clientId: clientId,
-            checkoutReference: checkoutRerefence,
-            profillingMerchantId: profillingMerchantId
-        )
         Tokenizer.initialize(clientId: clientId, checkoutRerefence: checkoutRerefence, environment: environment)
-
-        SentryManager.log(name: .SDK_INITIALIZED)
-        SentryManager.log(name: .NETHONE_PROFILER_INIT)
-        SentryManager.log(
-            error: NSError(
-                domain: "tnt",
-                code: 10,
-                userInfo: [
-                    "error": "Test Sentry"
-                ]
-            )
-        )
-        NethoneManager.shared.initialize(with: profillingMerchantId)
     }
 
     public static func tokenizeCard(
@@ -45,20 +25,12 @@ public struct MangopayCheckoutSDK {
 
         guard form.isFormValid else {
             callBack(nil, MGPError.invalidForm)
-            SentryManager.log(error: MGPError.invalidForm)
-            return
-        }
-
-        guard let attemptRef = NTHNethone.attemptReference() else {
-            callBack(nil, MGPError.nethoneAttemptReferenceRqd)
-            SentryManager.log(error: MGPError.nethoneAttemptReferenceRqd)
             return
         }
 
         Tokenizer.tokenize(
             card: form.cardData,
             with: cardReg.toVaultCardReg,
-            nethoeAttemptedRef: attemptRef
         ) { tokenizedCardData, error in
             var _payinData = payData
             _payinData?.cardID = tokenizedCardData?.card.cardID
@@ -82,21 +54,17 @@ public struct MangopayCheckoutSDK {
         
         guard let _ = payData else {
             on3DSError?(MGPError._3dsPayInDataRqd)
-            SentryManager.log(error: MGPError._3dsPayInDataRqd)
             return
         }
         
         guard let _ = viewController else {
             on3DSError?(MGPError._3dsPresentingVCRqd)
-            SentryManager.log(error: MGPError._3dsPresentingVCRqd)
             return
         }
         
         guard let urlStr = payData?.secureModeRedirectURL, let url = URL(string: urlStr) else {
             return
         }
-
-        SentryManager.log(name: .THREE_AUTH_REQ)
 
         let _3dsVC = ThreeDSController(
             secureModeReturnURL: url,
@@ -106,18 +74,12 @@ public struct MangopayCheckoutSDK {
                 switch result.status {
                 case .SUCCEEDED:
                     on3DSSucces?(result.id)
-                    SentryManager.log(name: .THREE_AUTH_COMPLETED)
                 case .FAILED:
                     on3DSFailure?(result.id)
-                    SentryManager.log(name: .THREE_AUTH_FAILED)
                 default: break
                 }
             }) { error in
                 on3DSError?(MGPError._3dsError(additionalInfo: error?.localizedDescription))
-                SentryManager.log(name: .THREE_AUTH_FAILED)
-                if let _error = error {
-                    SentryManager.log(error: _error)
-                }
             }
         
         viewController?.present(_3dsVC, animated: true)

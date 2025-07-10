@@ -19,7 +19,6 @@ public class MGPWebViewController: UIViewController {
     private var onError: ((Error?) -> ())?
 
     var authUrlNavigation: WKNavigation?
-    private var nethoneAttemptReference: String?
 
     lazy var mgpWebView = MGPWebView()
 
@@ -39,12 +38,10 @@ public class MGPWebViewController: UIViewController {
     
     public init(
         url: URL,
-        nethoneAttemptReference: String?,
         onComplete: ((_3DSResult) -> ())?,
         onError: ((Error?) -> ())?
     ) {
         self.url = url
-        self.nethoneAttemptReference = nethoneAttemptReference
         self.onComplete = onComplete
         self.onError = onError
         super.init(nibName: nil, bundle: nil)
@@ -113,7 +110,6 @@ extension MGPWebViewController: WKNavigationDelegate {
             return
         }
         
-        _3dsResult.nethoneAttemptReference = nethoneAttemptReference
         self.handleDismiss(_3dsResult: _3dsResult)
     }
 

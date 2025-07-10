@@ -7,9 +7,6 @@
 
 import Foundation
 import UIKit
-import PassKit
-import PayPal
-import NethoneSDK
 
 class PaymentFormView: UIView {
 
@@ -30,32 +27,6 @@ class PaymentFormView: UIView {
         font: .systemFont(ofSize: 12, weight: .medium)
     )
 
-    lazy var orPayWith = UILabel.create(
-        text: "Or pay with",
-        font: .systemFont(
-            ofSize: 15,
-            weight: .light
-        ),
-        textAlignment: .center
-    )
-
-    lazy var applePayButton: PKPaymentButton = {
-        let appleButton = PKPaymentButton(
-            paymentButtonType: paymentFormStyle.applePayButtonType,
-            paymentButtonStyle: paymentFormStyle.applePayButtonStyle
-        )
-        appleButton.cornerRadius = paymentFormStyle.applePayButtonCornerRadius
-        appleButton.heightAnchor.constraint(equalToConstant: 50).isActive = true
-        appleButton.titleLabel?.font = .systemFont(ofSize: 2)
-        appleButton.addTarget(
-            self,
-            action: #selector(onApplePayBtnTapped),
-            for: .touchUpInside
-        )
-        
-        return appleButton
-    }()
-
     lazy var paymentButton: UIButton = {
        let button = UIButton()
         button.backgroundColor = paymentFormStyle.checkoutButtonBackgroundColor
@@ -67,26 +38,6 @@ class PaymentFormView: UIView {
         return button
     }()
 
-    lazy var payPalButton: PayPalButton = {
-        let payPalButton = PayPalButton(
-            color: paymentMethodOptions.paypalConfig?.color ?? .gold,
-            edges: paymentMethodOptions.paypalConfig?.edges ?? .softEdges,
-            label: paymentMethodOptions.paypalConfig?.label
-        )
-        payPalButton.heightAnchor.constraint(equalToConstant: 50).isActive = true
-        payPalButton.layer.cornerRadius = 8
-        payPalButton.addTarget(self, action: #selector(onPaypalButtonTapped), for: .touchUpInside)
-        return payPalButton
-    }()
-
-    private lazy var hStack = UIStackView.create(
-        spacing: 8,
-        axis: .horizontal,
-        alignment: .fill,
-        distribution: .fillEqually,
-        views: [payPalButton, applePayButton]
-    )
-
     private lazy var vStack = UIScrollView.createWithVStack(
         spacing: 8,
         alignment: .fill,
@@ -96,15 +47,10 @@ class PaymentFormView: UIView {
             navView,
             paymentForm,
             paymentButton,
-//            payPalButton,
-            orPayWith,
-            hStack,
             statusLabel
         ]
     ) { stackView in
         stackView.setCustomSpacing(8, after: self.paymentButton)
-        stackView.setCustomSpacing(8, after: self.orPayWith)
-//        stackView.setCustomSpacing(32, after: self.applePayButton)
     }
 
     public var isFormValid: Bool {
@@ -115,7 +61,6 @@ class PaymentFormView: UIView {
     var expiryYear: Int?
 
     var tapGesture: UIGestureRecognizer?
-    var onApplePayTapped: (() -> ())?
     var onAPMTapped: ((Payable) -> ())?
 
     var keyboardUtil: KeyboardUtil?
@@ -155,8 +100,6 @@ class PaymentFormView: UIView {
             action: #selector(onViewTap)
         )
 
-        [orPayWith, applePayButton].forEach({$0.isHidden = !(paymentMethodOptions.applePayOptions?.shouldRenderApplePay == true)})
-        payPalButton.isHidden = paymentMethodOptions.paypalConfig == nil
         setupView()
 
         viewModel.onTokenisationCompleted = {
@@ -214,30 +157,8 @@ class PaymentFormView: UIView {
         finalizeButtonTapped()
         Task {
             callback.onPaymentMethodSelected?(.card(paymentForm.cardData))
-            SentryManager.log(name: .PAYMENT_METHOD_SELECTED, metadata: ["PaymentMethodType": "Card"])
         }
         Loader.show()
-    }
-
-    @objc func onPaypalButtonTapped() {
-        Task {
-            callback.onPaymentMethodSelected?(.payPal)
-            Loader.show()
-            if let paypalAPM = await callback.onCreatePayment?(.payPal, NTHNethone.attemptReference() ?? "") {
-                self.onAPMTapped?(paypalAPM)
-                SentryManager.log(name: .PAYMENT_METHOD_SELECTED, metadata: ["PaymentMethodType": "Paypal"])
-            }
-            Loader.hide()
-        }
-    }
-
-    @objc func onApplePayBtnTapped() {
-        onApplePayTapped?()
-        Task {
-            callback.onPaymentMethodSelected?(.applePay(.none))
-            SentryManager.log(name: .PAYMENT_METHOD_SELECTED, metadata: ["PaymentMethodType": "ApplePay"])
-
-        }
     }
 
     func finalizeButtonTapped() {
@@ -249,29 +170,12 @@ class PaymentFormView: UIView {
             )
         } else {
             Task {
-                SentryManager.log(name: .CARD_REGISTRATION_STARTED)
                 if let cardReg = await callback.onCreateCardRegistration?(self.paymentForm.cardData) {
-                    
-                    SentryManager.log(
-                        name: .CARD_REGISTRATION_COMPLETED,
-                        tags: [
-                            "Id": cardReg.id ?? "N/A",
-                            "CardType": cardReg.cardType ?? "N/A",
-                            "CardId": cardReg.cardID ?? "N/A",
-                            "Currency": cardReg.currency ?? "N/A",
-                            "ResultCode": cardReg.resultCode ?? "N?A",
-                            "Status": cardReg.status ?? "N/A"
-                            
-                        ]
-                    )
-    
                     self.viewModel.tokenizeCard(
                         form: self.paymentForm,
                         cardRegistration: cardReg,
                         callback: self.callback
                     )
-                } else {
-                    SentryManager.log(name: .CARD_REGISTRATION_FAILED)
                 }
             }
         }

@@ -12,7 +12,7 @@ public struct CallBack {
     var onTokenizationCompleted: ((TokenizedCardData) -> Void)?
     var onCreateCardRegistration: ((MGPCardInfo) async -> MGPCardRegistration?)?
     var onPaymentCompleted: ((String?, _3DSResult?) -> Void)?
-    var onCreatePayment: ((PaymentMethod, String?) async -> Payable?)?
+    var onCreatePayment: ((PaymentMethod) async -> Payable?)?
     var onCancel: (() -> Void)?
     var onError: ((MGPError) -> Void)?
 
@@ -21,7 +21,7 @@ public struct CallBack {
         onTokenizationCompleted: ( (TokenizedCardData) -> Void)? = nil,
         onCreateCardRegistration: ((MGPCardInfo) async -> MGPCardRegistration?)? = nil,
         onPaymentCompleted: ((String?, _3DSResult?) -> Void)? = nil,
-        onCreatePayment: ((PaymentMethod, String?) async -> Payable?)? = nil,
+        onCreatePayment: ((PaymentMethod) async -> Payable?)? = nil,
         onCancel: (() -> Void)?,
         onError: ((MGPError) -> Void)? = nil
     ) {

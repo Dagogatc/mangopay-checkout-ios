@@ -6,8 +6,6 @@
 //
 
 import UIKit
-import PassKit
-import NethoneSDK
 
 class PaymentFormController: UIViewController {
 
@@ -16,7 +14,6 @@ class PaymentFormController: UIViewController {
     var paymentFormStyle: PaymentFormStyle
     var callback: CallBack
     var paymentMethodOptions: PaymentMethodOptions
-    let paymentHandler = MGPApplePayHandler()
     var navVC: UINavigationController?
     
     public init(
@@ -55,7 +52,6 @@ class PaymentFormController: UIViewController {
         super.viewDidLoad()
         setupObservers()
         self.navVC = self.navigationController
-        SentryManager.log(name: .PAYMENT_METHODS_RENDERED)
     }
 
     override func viewDidLayoutSubviews() {
@@ -68,20 +64,11 @@ class PaymentFormController: UIViewController {
     }
 
     func setupObservers() {
-        formView.onApplePayTapped = {
-            guard let applePayConfig = self.paymentMethodOptions.applePayOptions else { return }
-            self.paymentHandler.setData(payRequest: applePayConfig.toPaymentRequest)
-            self.paymentHandler.startPayment(delegate: applePayConfig.delegate) { (success) in
-                if success {
-                }
-            }
-        }
         
         formView.onClosedTapped = {
             self.navigationController?.dismiss(animated: true, completion: {
 
                 self.callback.onCancel?()
-                NethoneManager.shared.cancelNethoneAttemptIfAny()
             })
         }
         
@@ -89,27 +76,20 @@ class PaymentFormController: UIViewController {
             if let _urlStr = apmInfo.secureModeRedirectURL, let url = URL(string: _urlStr) {
                 let urlController = MGPWebViewController(
                     url: url,
-                    nethoneAttemptReference: NTHNethone.attemptReference(),
                     onComplete: { status in
 
                         self.callback.onPaymentCompleted?(nil, status)
                         switch status.status {
-                        case .SUCCEEDED:
-                            SentryManager.log(name: .PAYMENT_COMPLETED)
-                        case .FAILED:
-                            SentryManager.log(name: .PAYMENT_ERRORED)
-
-                            NethoneManager.shared.performFinalizeAttempt { res, attemptRef in
-                                self.callback.onPaymentCompleted?(nil, status)
-                            }
+                        case .SUCCEEDED: break
+                            
+                        case .FAILED: break
+                            
                         case .CANCELLED: break
                             
                         }
                     },
                     onError: { error in
                         self.callback.onError?(MGPError._3dsError(additionalInfo: error?.localizedDescription))
-                        SentryManager.log(name: .PAYMENT_FAILED)
-                        SentryManager.log(error: MGPError._3dsError(additionalInfo: error?.localizedDescription))
                     }
                 )
                 
@@ -139,7 +119,6 @@ class PaymentFormController: UIViewController {
                 UIAlertAction(title: "Yes", style: .destructive, handler: { _ in
                     self.dismiss(animated: true) {
                         self.callback.onCancel?()
-                        NethoneManager.shared.cancelNethoneAttemptIfAny()
                     }
                 }),
                 UIAlertAction(title: "No", style: .default)
@@ -163,14 +142,13 @@ class PaymentFormController: UIViewController {
     private func launch3DSIfPossible(
         paymentObj: Payable? = nil
     ) {
-        SentryManager.log(name: .THREE_AUTH_REQ)
 
         MGPPaymentSheet().launch3DSIfPossible(payData: paymentObj, presentIn: self) { result in
             switch result.status {
-            case .SUCCEEDED:
-                SentryManager.log(name: .THREE_AUTH_COMPLETED)
-            case .FAILED:
-                SentryManager.log(name: .THREE_AUTH_FAILED)
+            case .SUCCEEDED: break
+                
+            case .FAILED: break
+                
             default: break
             }
             self.callback.onPaymentCompleted?(result.id, result)
@@ -184,13 +162,13 @@ class PaymentFormController: UIViewController {
             }
         } on3DSError: { error in
             print("error", error)
-            SentryManager.log(name: .THREE_AUTH_FAILED)
+            
             switch error {
             case ._3dsNotRqd:
                 self.callback.onPaymentCompleted?(nil, _3DSResult(type: .cardDirect, status: .SUCCEEDED, id: paymentObj?.cardID ?? ""))
             default: break
             }
-            SentryManager.log(error: error)
+            
         }
     }
 }

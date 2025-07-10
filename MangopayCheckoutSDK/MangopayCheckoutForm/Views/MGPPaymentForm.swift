@@ -8,7 +8,6 @@
 #if os(iOS)
 import UIKit
 #endif
-import NethoneSDK
 import MangopayVaultSDK
 
 public class MGPPaymentForm: UIView, FormValidatable {
@@ -142,7 +141,6 @@ public class MGPPaymentForm: UIView, FormValidatable {
         
         setupView()
         setCards(cards: CardConfig(supportedCardBrands: supportedCardBrands))
-        initiateNethone()
         
         cardNumberField.onEditingChanged = { text in
             self.cardType = CardTypeChecker.getCreditCardType(cardNumber: text)
@@ -220,62 +218,20 @@ public class MGPPaymentForm: UIView, FormValidatable {
         self.cardRegistration = cardRegistration
     }
 
-    func initiateNethone() {
-        let nethoneConfig = NTHAttemptConfiguration()
-        nethoneConfig.registeredTextFieldsOnly = true
-
-        registerTextfieldsToNethone()
-
-        do {
-            try NTHNethone.beginAttempt(with: nethoneConfig)
-        } catch { error
-            print("Nethone intiation Error", error.localizedDescription)
-        }
-    }
-
-    func registerTextfieldsToNethone() {
-        NTHNethone.register(
-            cardNumberField.textfield,
-            mode: .ContentFree,
-            name: "cardNumberField"
-        )
-
-        NTHNethone.register(
-            expiryDateField.textfield,
-            mode: .ContentFree,
-            name: "expiryDateField"
-        )
-
-        NTHNethone.register(
-            cvvField.textfield,
-            mode: .ContentFree,
-            name: "cvvField"
-        )
-    }
-
     func tokenizeCard(callBack: @escaping MangopayTokenizedCallBack) {
         guard self.isFormValid else {
             callBack(nil, MGPError.invalidForm)
-            SentryManager.log(error: MGPError.invalidForm)
-            return
-        }
-
-        guard let attemptRef = NTHNethone.attemptReference() else {
-            callBack(nil, MGPError.nethoneAttemptReferenceRqd)
-            SentryManager.log(error: MGPError.nethoneAttemptReferenceRqd)
             return
         }
 
         guard let cardReg = cardRegistration else {
             callBack(nil, MGPError.cardRegistrationNotSet)
-            SentryManager.log(error: MGPError.cardRegistrationNotSet)
             return
         }
 
         Tokenizer.tokenize(
             card: self.cardData,
-            with: cardReg.toVaultCardReg,
-            nethoeAttemptedRef: attemptRef
+            with: cardReg.toVaultCardReg
         ) { tokenizedCardData, error in
             callBack(tokenizedCardData, error)
         }
@@ -484,25 +440,6 @@ extension MGPPaymentForm: UITextFieldDelegate {
     }
     
     public func textFieldDidEndEditing(_ textField: UITextField) {
-        
-        switch textField {
-        case cardNumberField.textfield:
-            let isValid = isFormValid(cardNumberField)
-            if !isValid {
-                SentryManager.log(error: MGPError.cardNameInvalid)
-            }
-        case expiryDateField.textfield:
-            let isValid = isFormValid(expiryDateField)
-            if !isValid {
-                SentryManager.log(error: MGPError.cardExpiryInvalid)
-            }
-        case cvvField.textfield:
-            let isValid = isFormValid(cvvField)
-            if !isValid {
-                SentryManager.log(error: MGPError.cvvInvalid)
-            }
-        default: break
-        }
         didEndEditing?(self)
     }
 }

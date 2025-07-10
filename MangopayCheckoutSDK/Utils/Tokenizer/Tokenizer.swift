@@ -28,7 +28,6 @@ struct Tokenizer {
     public static func tokenize(
         card: MGPCardInfo,
         with cardReg: CardRegistration,
-        nethoeAttemptedRef: String,
         mangoPayVaultCallback: @escaping MangopayTokenizedCallBack
     ) {
 
@@ -49,13 +48,11 @@ struct Tokenizer {
             cardRegistration: cardReg) { tokenisedCard, error in
                 guard let _card = tokenisedCard else {
                     mangoPayVaultCallback(.none, MGPError.tokenizationError(additionalInfo: error?.localizedDescription))
-                    SentryManager.log(error: MGPError.tokenizationError(additionalInfo: error?.localizedDescription))
                     return
                     
                 }
                 let res = TokenizedCardData(
-                    card: _card,
-                    profilingAttemptReference: nethoeAttemptedRef
+                    card: _card
                 )
                 mangoPayVaultCallback(res, .none)
             }

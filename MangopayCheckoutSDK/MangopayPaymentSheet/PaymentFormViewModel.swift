@@ -31,28 +31,15 @@ public class PaymentFormViewModel {
         form.setCardRegistration(cardRegistration)
         form.tokenizeCard { tokenizedCardData, error in
             if let _ = tokenizedCardData, let card = tokenizedCardData?.card, let cardData = tokenizedCardData {
-                NethoneManager.shared.performFinalizeAttempt { _ , attemptRef in
-                    DispatchQueue.main.async {
-                        callback.onTokenizationCompleted?(cardData)
-                        self.onTokenisationCompleted?()
-                        SentryManager.log(
-                            name: .TOKENIZATION_COMPLETED,
-                            tags: [
-                                "Id": card.id ?? "N/A",
-                                "CardType": card.cardType ?? "N/A",
-                                "CardId": card.cardID ?? "N/A",
-                                "Currency": card.currency ?? "N/A",
-                                "ResultCode": card.resultCode ?? "N?A",
-                                "Status": card.status ?? "N/A"
-                                
-                            ]
-                        )
-                        if let createAction = callback.onCreatePayment {
-                            Task {
-                                if let paymentObj = await createAction(.card(nil), attemptRef) {
-                                    self.onCreatePaymentComplete?(paymentObj)
-                                } else {
-                                }
+                DispatchQueue.main.async {
+                    callback.onTokenizationCompleted?(cardData)
+                    self.onTokenisationCompleted?()
+                    
+                    if let createAction = callback.onCreatePayment {
+                        Task {
+                            if let paymentObj = await createAction(.card(nil)) {
+                                self.onCreatePaymentComplete?(paymentObj)
+                            } else {
                             }
                         }
                     }
@@ -61,10 +48,8 @@ public class PaymentFormViewModel {
 
             if let _error = error {
                 DispatchQueue.main.async {
-                    SentryManager.log(name: .TOKENIZATION_FAILED)
                     self.onTokenisationError?(_error)
                     callback.onError?(_error)
-                    SentryManager.log(error: _error)
                 }
             }
         }

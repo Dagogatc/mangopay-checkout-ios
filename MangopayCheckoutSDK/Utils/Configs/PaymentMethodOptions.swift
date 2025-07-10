@@ -9,17 +9,11 @@ import Foundation
 
 public struct PaymentMethodOptions {
     var cardOptions: MGPCardOptions?
-    var applePayOptions: MGPApplePayOptions?
-    var paypalConfig: MGPPaypalOptions?
 
     public init(
-        cardOptions: MGPCardOptions,
-        applePayOptions: MGPApplePayOptions? = nil,
-        paypalOptions: MGPPaypalOptions? = nil
+        cardOptions: MGPCardOptions
     ) {
         self.cardOptions =  cardOptions
-        self.applePayOptions = applePayOptions
-        self.paypalConfig = paypalOptions
     }
 }
 

@@ -23,19 +23,13 @@ Pod::Spec.new do |spec|
   spec.source       = { :git => "https://github.com/Mangopay/mangopay-checkout-ios.git", :tag => "#{spec.version}", :branch => "main" }
 
   spec.source_files  = "MangopayCheckoutSDK/**/*.swift"
-  spec.dependency     'PayPal/PaymentButtons'
   spec.dependency     'MangopayVaultSDK', '~> 1.0.8'
-  spec.dependency     'Sentry'
   spec.exclude_files = [
   'MangopayCheckoutSDK/Resources/SPMextension.swift',
-  'MangopayCheckoutSDK/Utils/Configs/Paypal/MGPPaypalOptions.swift',
   'MangopayCheckoutSDK/MangopayPaymentSheet/PaymentFormView.swift'
   ]
   
   spec.resource_bundles = {
     'MangopayiOSSDK_MangopayCheckoutSDK' => ['MangopayCheckoutSDK/**/*.{lproj,png,jpeg,jpg,storyboard,xib,xcassets,json}']
   }
-
-
-  spec.vendored_frameworks = "Integrations/NethoneSDK.xcframework"
 end

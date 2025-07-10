@@ -40,6 +40,5 @@ public struct _3DSResult: Codable {
     public let type: _3DSTransactionType
     public let status: _3DSStatus
     public let id: String
-    public var nethoneAttemptReference: String?
 
 }
