@@ -440,6 +440,15 @@ extension MGPPaymentForm: UITextFieldDelegate {
     }
     
     public func textFieldDidEndEditing(_ textField: UITextField) {
+        switch textField {
+        case cardNumberField.textfield:
+            isFormValid(cardNumberField)
+        case expiryDateField.textfield:
+            isFormValid(expiryDateField)
+        case cvvField.textfield:
+            isFormValid(cvvField)
+        default: break
+        }
         didEndEditing?(self)
     }
 }
